@@ -1,0 +1,118 @@
+openapi: 3.1.0
+info:
+  title: RECORE OSS API
+  version: 0.1.0
+  description: |
+    RECOREライクなリユース業向け在庫・仕入・販売APIの最小定義。
+servers:
+  - url: https://api.example.com
+paths:
+  /health:
+    get:
+      summary: Health check
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  status:
+                    type: string
+                    example: ok
+  /items:
+    post:
+      summary: Create item
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ItemCreate'
+      responses:
+        '201':
+          description: Created
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Item'
+    get:
+      summary: Search items
+      parameters:
+        - in: query
+          name: q
+          schema:
+            type: string
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Item'
+  /items/{id}:
+    get:
+      summary: Get item by ID
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema:
+            type: string
+            format: uuid
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Item'
+        '404':
+          description: Not Found
+components:
+  schemas:
+    Item:
+      type: object
+      required: [id, sku, name, condition, purchase_price, sale_price, status]
+      properties:
+        id:
+          type: string
+          format: uuid
+        sku:
+          type: string
+        jan:
+          type: string
+          nullable: true
+        name:
+          type: string
+        condition:
+          type: string
+          enum: [new, used-a, used-b, junk]
+        purchase_price:
+          type: number
+        sale_price:
+          type: number
+        status:
+          type: string
+          enum: [draft, in_stock, sold, returned, archived]
+    ItemCreate:
+      type: object
+      required: [sku, name, condition, purchase_price, sale_price]
+      properties:
+        sku:
+          type: string
+        jan:
+          type: string
+          nullable: true
+        name:
+          type: string
+        condition:
+          type: string
+          enum: [new, used-a, used-b, junk]
+        purchase_price:
+          type: number
+        sale_price:
+          type: number
